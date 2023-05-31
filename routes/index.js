@@ -1,12 +1,11 @@
-let express = require('express');
-
-let router = express.Router();
-const User = require('../models/user');
-
-const bcrypt = require('bcryptjs');
-const debug = require('debug')('time');
-
+const express = require('express');
+const mongoose = require('mongoose');
 const { body, validationResult } = require('express-validator');
+
+const router = express.Router();
+const bcrypt = require('bcryptjs');
+// Models
+const User = require('../models/user');
 
 /* GET home page. */
 router.get('/', (req, res, next) => {
@@ -14,7 +13,6 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/sign-up', (req, res, next) => {
-  const err = req.body;
   res.render('sign-up');
 });
 
@@ -22,19 +20,29 @@ router.post('/sign-up', [
   body('name').trim().escape(),
   body('email').trim().escape(),
   body('password').trim().escape(),
+  body('isMember').trim().escape(),
 
   async (req, res, next) => {
     // Error occurred in the form body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.render('sign-up', { err: errors });
+      console.log('validation error');
+      return res.render('sign-up', { err: errors.array() });
     }
 
     // Passwords don't match
     const { password } = req.body;
-    const confirmPassword = req.body['confirm-password'];
+    const { confirmPassword } = req.body;
     if (password !== confirmPassword) {
-      return res.render('sign-up', { err: `confirm password doesn't match` });
+      console.log('passwords unmatching error');
+      const cachedForm = {
+        name: req.body.name,
+        email: req.body.email,
+      };
+      return res.render('sign-up', {
+        err: `Passwords don't match`,
+        form: cachedForm,
+      });
     }
 
     // If errors above don't occur, proceed to saving data
@@ -43,6 +51,7 @@ router.post('/sign-up', [
       name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
+      isMember: req.body.isMember,
     });
     await newUser.save();
     res.redirect('/login');

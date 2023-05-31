@@ -5,11 +5,11 @@ body
   form(action='' method='post')
     div
       label(for='name') Name
-      input(id='name' name='name' type='text' required)
+      input(id='name' name='name' type='text' value=form ? form.name : '' required)
 
     div
       label(for='email') Email
-      input(id='email' name='email' type='email' required)
+      input(id='email' name='email' type='email' value=form ? form.email : '' required)
 
     div
       label(for='password') Password
@@ -17,10 +17,13 @@ body
 
     div
       label(for='confirm-password') Confirm password
-      input(id='confirm-password' name='confirm-password' type='password' required)
+      input(id='confirm-password' name='confirmPassword' type='password' required)
 
     div
       label(for='is-member') Are you a member?
-      input(id='is-member' name='is-member' type='checkbox' value='true')
+      input(id='is-member' name='isMember' type='checkbox' value='true')
+
+    if err
+      p #{err}
 
     button Sign up
