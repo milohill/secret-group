@@ -19,33 +19,29 @@ router.get('/sign-up', (req, res, next) => {
 router.post('/sign-up', [
   body('name').trim().escape(),
   body('email').trim().escape(),
-  body('password').trim().escape(),
+  body('password')
+    .trim()
+    .escape()
+    .custom((value, { req }) => value === req.body.confirmPassword)
+    .withMessage('Passwords do not match'),
   body('isMember').trim().escape(),
 
   async (req, res, next) => {
     // Error occurred in the form body
     const errors = validationResult(req);
+    const cachedForm = {
+      name: req.body.name,
+      email: req.body.email,
+    };
     if (!errors.isEmpty()) {
       console.log('validation error');
-      return res.render('sign-up', { err: errors.array() });
-    }
-
-    // Passwords don't match
-    const { password } = req.body;
-    const { confirmPassword } = req.body;
-    if (password !== confirmPassword) {
-      console.log('passwords unmatching error');
-      const cachedForm = {
-        name: req.body.name,
-        email: req.body.email,
-      };
+      console.log(errors.array());
       return res.render('sign-up', {
-        err: `Passwords don't match`,
+        err: errors.array(),
         form: cachedForm,
       });
     }
 
-    // If errors above don't occur, proceed to saving data
     const hashedPassword = bcrypt.hashSync(req.body.password, 10);
     const newUser = new User({
       name: req.body.name,
