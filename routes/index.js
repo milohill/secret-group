@@ -47,7 +47,6 @@ router.post('/sign-up', [
       name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
-      isMember: req.body.isMember,
     });
     await newUser.save();
     res.redirect('/login');

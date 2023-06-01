@@ -1,0 +1,10 @@
+head
+  link(rel='stylesheet' type='text/css' href='/stylesheets/style.css')
+body
+  h1 Are you one of the secret members?
+  form(action='/' method='post')
+    div
+      label(for='secret-code') Secret Code
+      input(id='secret-code' name='secretCode' type='text' required)
+    button Register
+

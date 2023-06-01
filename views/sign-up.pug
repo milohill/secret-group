@@ -19,10 +19,6 @@ body
       label(for='confirm-password') Confirm password
       input(id='confirm-password' name='confirmPassword' type='password' required)
 
-    div
-      label(for='is-member') Are you a member?
-      input(id='is-member' name='isMember' type='checkbox' value='true')
-
     if err
       for er in err
         p #{er.msg}
