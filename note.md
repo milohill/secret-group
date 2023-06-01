@@ -1,8 +1,8 @@
 - validation
 - security features before production
-- compression
-- helmet
-- ratelimiter
+    - compression
+    - helmet
+    - ratelimiter
 - dotenv (environment variables)
 - set a cookie and remembers the user name
 - confirm password feature

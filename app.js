@@ -4,6 +4,12 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 const mongoose = require('mongoose');
+require('dotenv').config();
+
+// Cookie
+const session = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 
 const mongoDB =
   'mongodb+srv://admin-tanja:jR~n$jK3rCRiXes@cluster0.ezneo3l.mongodb.net/?retryWrites=true&w=majority';
