@@ -2,8 +2,11 @@ head
   link(rel='stylesheet' type='text/css' href='/stylesheets/style.css')
 body
   if user
-    h1 Welcome, #{user.name}
-    a(href='/register-membership') Register a membership
+    if user.isMember
+      h1(id='highlight') Приятно познакомиться, товарищ
+    else
+      h1 Welcome, #{user.name}
+      a(href='/register-membership') Register a membership
   else
     h1 Welcome
     a(href='/sign-up') Sign up

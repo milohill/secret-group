@@ -22,3 +22,7 @@ form {
   width: 200px;
   margin: auto;
 }
+
+#highlight {
+  color: red;
+}

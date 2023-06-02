@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
 const passport = require('passport');
 require('dotenv').config();
 
