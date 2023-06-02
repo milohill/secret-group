@@ -5,14 +5,21 @@ let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 const mongoose = require('mongoose');
 require('dotenv').config();
+const bcrypt = require('bcryptjs');
+const flash = require('connect-flash');
 
-// Cookie
+// Middlewares
+
+// Cookie handlers
 const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
-const mongoDB =
-  'mongodb+srv://admin-tanja:jR~n$jK3rCRiXes@cluster0.ezneo3l.mongodb.net/?retryWrites=true&w=majority';
+// Models
+const User = require('./models/user');
+
+// Application
+const mongoDB = process.env.MONGO_DB_URL;
 
 const main = async () => {
   await mongoose.connect(mongoDB);
@@ -32,11 +39,56 @@ mongoose.set('strictQuery', false);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+// Passport configuration
+passport.use(
+  new LocalStrategy(
+    { usernameField: 'email', passwordField: 'password' },
+    async function (email, password, done) {
+      const user = await User.findOne({ email: email });
+      bcrypt.compare(password, user.password, function (err, res) {
+        if (res) {
+          return done(null, user);
+        }
+        return done(null, false, {
+          message: 'Incorrect password',
+        });
+      });
+    }
+  )
+);
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async function (id, done) {
+  try {
+    const user = await User.findOne({ _id: id });
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
+});
+
+// Express configuration
+app.use(flash());
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Authentication
+app.use(passport.initialize());
+app.use(passport.session());
+
+// app.use(flashMessageHandler);
 
 app.use('/', indexRouter);
 

@@ -1,15 +1,20 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { body, validationResult } = require('express-validator');
+const passport = require('passport');
+require('dotenv').config();
 
 const router = express.Router();
-const bcrypt = require('bcryptjs');
 // Models
 const User = require('../models/user');
 
 /* GET home page. */
-router.get('/', (req, res, next) => {
-  res.render('index');
+router.get('/', (req, res) => {
+  const { user } = req;
+  if (!user) {
+    return res.render('index');
+  }
+  res.render('index', { user: user });
 });
 
 router.get('/sign-up', (req, res, next) => {
@@ -53,8 +58,37 @@ router.post('/sign-up', [
   },
 ]);
 
-router.get('/login', (req, res, next) => {
-  res.render('login');
+router.get('/login', (req, res) => {
+  res.render('login', { err: req.flash('error') });
+});
+
+router.post(
+  '/login',
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true,
+  })
+);
+
+router.get('/register-membership', (req, res) => {
+  res.render('register-membership');
+});
+
+router.post('/register-membership', async (req, res) => {
+  if (req.body.secretCode === process.env.MEMBERSHIP_CODE) {
+    const oldUser = await User.findOne({ _id: req.session.passport.user });
+    const user = new User({
+      _id: oldUser._id,
+      name: oldUser.name,
+      email: oldUser.email,
+      password: oldUser.password,
+      isMember: true,
+    });
+    await User.findByIdAndUpdate(oldUser._id, user, {});
+    return res.redirect('/');
+  }
+  return res.render('register-membership', { err: 'Wrong code' });
 });
 
 module.exports = router;

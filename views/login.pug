@@ -11,4 +11,8 @@ body
       label(for='password') Password
       input(id='password' name='password' type='password' required)
 
+    if err
+      for er in err
+        p #{er}
+
     button Login
