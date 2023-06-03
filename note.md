@@ -11,3 +11,7 @@
 - Don't forget to customize the name fields for the LocalStratege.
 
 1. Create a webpage that allows users to become registered secret members by entering a confidential code.
+
+2. Create a new message page and feature
+
+3. Display all the messages on the index page but authors and dates are only visible to the members

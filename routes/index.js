@@ -8,6 +8,7 @@ require('dotenv').config();
 const router = express.Router();
 // Models
 const User = require('../models/user');
+const Message = require('../models/message');
 
 /* GET home page. */
 router.get('/', (req, res) => {
@@ -91,5 +92,29 @@ router.post('/register-membership', async (req, res) => {
   }
   return res.render('register-membership', { err: 'Wrong code' });
 });
+
+router.get('/new-message', (req, res) => {
+  res.render('new-message');
+});
+
+router.post(
+  '/new-message',
+  body('title').trim().escape(),
+  body('content').trim().escape(),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.render('new-message', { err: errors.array() });
+    }
+
+    const message = new Message({
+      author: req.user._id,
+      title: req.body.title,
+      content: req.body.content,
+    });
+    await message.save();
+    return res.render('new-message', { err: ['A message posted'] });
+  }
+);
 
 module.exports = router;

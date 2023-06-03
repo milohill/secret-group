@@ -1,0 +1,18 @@
+head
+  link(rel='stylesheet' type='text/css' href='/stylesheets/style.css')
+body
+  h1 What do you have in your mind today?
+  form(action='' method='post')
+    div
+      label(for='title') Title
+      input(id='title' name='title' type='text' required)
+
+    div
+      label(for='content') Content
+      textarea(id='content' name='content' cols='40' rows='10')
+
+    if err
+      for er in err
+        p #{er}
+
+    button Post
