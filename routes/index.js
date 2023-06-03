@@ -23,6 +23,12 @@ router.get('/', async (req, res) => {
   return res.render('index', { user: user, messages: messages });
 });
 
+router.post('/', async (req, res) => {
+  const { id } = req.body;
+  await Message.findByIdAndDelete(id);
+  res.redirect('/');
+});
+
 router.get('/sign-up', (req, res, next) => {
   res.render('sign-up');
 });
@@ -90,6 +96,18 @@ router.post('/register-membership', async (req, res) => {
       email: oldUser.email,
       password: oldUser.password,
       isMember: true,
+    });
+    await User.findByIdAndUpdate(oldUser._id, user, {});
+    return res.redirect('/');
+  }
+  if (req.body.secretCode === process.env.ADMIN_CODE) {
+    const oldUser = await User.findOne({ _id: req.session.passport.user });
+    const user = new User({
+      _id: oldUser._id,
+      name: oldUser.name,
+      email: oldUser.email,
+      password: oldUser.password,
+      isAdmin: true,
     });
     await User.findByIdAndUpdate(oldUser._id, user, {});
     return res.redirect('/');

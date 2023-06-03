@@ -4,6 +4,10 @@ body
   if user
     if user.isMember
       h1(id='highlight') Приятно познакомиться, товарищ
+      a(href='/register-membership') Register a membership
+      a(href='/new-message') Post a new message
+    else if user.isAdmin
+      h1(id='highlight') На́хрен с ним
       a(href='/new-message') Post a new message
     else
       h1 Welcome, #{user.name}
@@ -23,6 +27,10 @@ body
           span #{message.content}
           span
             small #{message.date.toLocaleDateString('en-us', {month:"short", day:"numeric", hour:'numeric', minute: 'numeric', second: 'numeric'})}
-          if user.isMember
+          if user.isMember || user.isAdmin
             span
               small Posted by #{message.author.name}
+          if user.isAdmin
+            form(action='' method='post')
+              input(type='hidden' name='id' value=message._id)
+              button Delete
