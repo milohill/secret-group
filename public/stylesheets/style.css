@@ -23,6 +23,25 @@ form {
   margin: auto;
 }
 
+.message-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 30px;
+  width: 80%;
+  height: 500px;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  border: 1px solid black;
+  width: 20%px;
+  height: 200px;
+}
+
 #highlight {
   color: red;
 }

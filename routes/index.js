@@ -11,12 +11,16 @@ const User = require('../models/user');
 const Message = require('../models/message');
 
 /* GET home page. */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   const { user } = req;
   if (!user) {
     return res.render('index');
   }
-  res.render('index', { user: user });
+
+  const messages = await Message.find().populate('author').exec();
+  console.log(messages);
+
+  return res.render('index', { user: user, messages: messages });
 });
 
 router.get('/sign-up', (req, res, next) => {
@@ -99,8 +103,8 @@ router.get('/new-message', (req, res) => {
 
 router.post(
   '/new-message',
-  body('title').trim().escape(),
-  body('content').trim().escape(),
+  body('title').trim(),
+  body('content').trim(),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

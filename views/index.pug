@@ -4,6 +4,7 @@ body
   if user
     if user.isMember
       h1(id='highlight') Приятно познакомиться, товарищ
+      a(href='/new-message') Post a new message
     else
       h1 Welcome, #{user.name}
       a(href='/register-membership') Register a membership
@@ -12,3 +13,16 @@ body
     h1 Welcome
     a(href='/sign-up') Sign up
     a(href='/login') Login
+  
+  if messages
+    div.message-container
+      for message in messages 
+        div.message
+          span 
+            b #{message.title}
+          span #{message.content}
+          span
+            small #{message.date.toLocaleDateString('en-us', {month:"short", day:"numeric", hour:'numeric', minute: 'numeric', second: 'numeric'})}
+          if user.isMember
+            span
+              small Posted by #{message.author.name}
