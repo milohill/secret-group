@@ -1,14 +1,12 @@
-let createError = require('http-errors');
-let express = require('express');
-let path = require('path');
-let cookieParser = require('cookie-parser');
-let logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const flash = require('connect-flash');
-
-// Middlewares
 
 // Cookie handlers
 const session = require('express-session');
@@ -18,7 +16,7 @@ const LocalStrategy = require('passport-local').Strategy;
 // Models
 const User = require('./models/user');
 
-// Application
+// DB
 const mongoDB = process.env.MONGO_DB_URL;
 
 const main = async () => {
@@ -29,13 +27,19 @@ main().catch((err) => {
   console.log(err);
 });
 
-let indexRouter = require('./routes/index');
+// Production
+const compression = require('compression');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
-let app = express();
+// Application
+const indexRouter = require('./routes/index');
+
+const app = express();
 
 mongoose.set('strictQuery', false);
 
-// view engine setup
+// View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
@@ -71,13 +75,6 @@ passport.deserializeUser(async function (id, done) {
 
 // Express configuration
 app.use(flash());
-app.use(
-  session({
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: false,
-  })
-);
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -85,11 +82,27 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Authentication
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.use(flashMessageHandler);
+// Production setup
+app.use(helmet());
+app.use(compression());
+app.use(
+  rateLimit({
+    windowMs: 1 * 10 * 60 * 1000, // 10 minutes
+    max: 100,
+  })
+);
 
+// Routing
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler

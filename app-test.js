@@ -199,7 +199,7 @@ app.get('/register', (req, res, next) => {
                     <br><br><input type="submit" value="Submit"></form>';
   res.send(form);
 });
-app.post('/register', (req, res, next) => {
+app.post('/register', async (req, res, next) => {
   const saltHash = genPassword(req.body.password);
 
   const { salt } = saltHash;
@@ -209,9 +209,7 @@ app.post('/register', (req, res, next) => {
     hash: hash,
     salt: salt,
   });
-  newUser.save().then((user) => {
-    console.log(user);
-  });
+  await newUser.save();
   res.redirect('/login');
 });
 /**
@@ -221,7 +219,6 @@ app.post('/register', (req, res, next) => {
  * Also, look up what behaviour express session has without a maxage set
  */
 app.get('/protected-route', (req, res, next) => {
-  console.log(req.session);
   if (req.isAuthenticated()) {
     res.send('<h1>You are authenticated</h1>');
   } else {
@@ -234,7 +231,6 @@ app.get('/logout', (req, res, next) => {
   res.redirect('/login');
 });
 app.get('/login-success', (req, res, next) => {
-  console.log(req.session);
   res.send('You successfully logged in.');
 });
 app.get('/login-failure', (req, res, next) => {

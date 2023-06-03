@@ -3,34 +3,37 @@ head
 body
   if user
     if user.isMember
-      h1(id='highlight') Приятно познакомиться, товарищ
-      a(href='/register-membership') Register a membership
+      h1 Hello, member
+      a(href='/register-membership') Redeem a secret code
       a(href='/new-message') Post a new message
+      a(href='/logout') Logout
     else if user.isAdmin
-      h1(id='highlight') На́хрен с ним
+      h1 Hello, admin
+      a(href='/register-membership') Redeem a secret code
       a(href='/new-message') Post a new message
+      a(href='/logout') Logout
     else
-      h1 Welcome, #{user.name}
-      a(href='/register-membership') Register a membership
+      h1 Hello, #{user.name}
+      a(href='/register-membership') Redeem a secret code
       a(href='/new-message') Post a new message
+      a(href='/logout') Logout
+    if messages
+      div.message-container
+        for message in messages 
+          div.message
+            span 
+              b #{message.title}
+            span #{message.content}
+            span
+              small #{message.date.toLocaleDateString('en-us', {month:"short", day:"numeric", hour:'numeric', minute: 'numeric', second: 'numeric'})}
+            if user.isMember || user.isAdmin
+              span
+                small Posted by #{message.author.name}
+            if user.isAdmin
+              form(action='' method='post')
+                input(type='hidden' name='id' value=message._id)
+                button Delete
   else
-    h1 Welcome
+    h1 Welcome!
     a(href='/sign-up') Sign up
     a(href='/login') Login
-  
-  if messages
-    div.message-container
-      for message in messages 
-        div.message
-          span 
-            b #{message.title}
-          span #{message.content}
-          span
-            small #{message.date.toLocaleDateString('en-us', {month:"short", day:"numeric", hour:'numeric', minute: 'numeric', second: 'numeric'})}
-          if user.isMember || user.isAdmin
-            span
-              small Posted by #{message.author.name}
-          if user.isAdmin
-            form(action='' method='post')
-              input(type='hidden' name='id' value=message._id)
-              button Delete

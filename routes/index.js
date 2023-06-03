@@ -10,16 +10,9 @@ const router = express.Router();
 const User = require('../models/user');
 const Message = require('../models/message');
 
-/* GET home page. */
 router.get('/', async (req, res) => {
   const { user } = req;
-  if (!user) {
-    return res.render('index');
-  }
-
   const messages = await Message.find().populate('author').exec();
-  console.log(messages);
-
   return res.render('index', { user: user, messages: messages });
 });
 
@@ -51,8 +44,6 @@ router.post('/sign-up', [
       email: req.body.email,
     };
     if (!errors.isEmpty()) {
-      console.log('validation error');
-      console.log(errors.array());
       return res.render('sign-up', {
         err: errors.array(),
         form: cachedForm,
@@ -138,5 +129,12 @@ router.post(
     return res.render('new-message', { err: ['A message posted'] });
   }
 );
+
+router.get('/logout', (req, res, next) => {
+  req.logout((err) => {
+    next(err);
+  });
+  res.redirect('/');
+});
 
 module.exports = router;
