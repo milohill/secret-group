@@ -8,7 +8,7 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const flash = require('connect-flash');
 
-// Cookie handlers
+// Session handlers
 const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -33,7 +33,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 // Application
-const indexRouter = require('./routes/index');
+const indexRoute = require('./routes/index');
 
 const app = express();
 
@@ -64,9 +64,9 @@ passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
 
-passport.deserializeUser(async function (id, done) {
+passport.deserializeUser(async function (userId, done) {
   try {
-    const user = await User.findOne({ _id: id });
+    const user = await User.findOne({ _id: userId }).exec();
     done(null, user);
   } catch (err) {
     done(err);
@@ -91,6 +91,10 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+app.use((req, res, next) => {
+  res.locals.currentUser = req.user;
+  next();
+});
 
 // Production setup
 app.use(helmet());
@@ -102,8 +106,8 @@ app.use(
   })
 );
 
-// Routing
-app.use('/', indexRouter);
+// Route
+app.use('/', indexRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -1,21 +1,21 @@
 head
   link(rel='stylesheet' type='text/css' href='/stylesheets/style.css')
 body
-  if user
-    if user.isMember
+  if currentUser
+    if currentUser.isMember
       h1 Hello, member
-      a(href='/register-membership') Redeem a secret code
-      a(href='/new-message') Post a new message
+      a(href='/redeem') Redeem a secret code
+      a(href='/message') Post a new message
       a(href='/logout') Logout
-    else if user.isAdmin
+    else if currentUser.isAdmin
       h1 Hello, admin
-      a(href='/register-membership') Redeem a secret code
-      a(href='/new-message') Post a new message
+      a(href='/redeem') Redeem a secret code
+      a(href='/message') Post a new message
       a(href='/logout') Logout
     else
-      h1 Hello, #{user.name}
-      a(href='/register-membership') Redeem a secret code
-      a(href='/new-message') Post a new message
+      h1 Hello, #{currentUser.name}
+      a(href='/redeem') Redeem a secret code
+      a(href='/message') Post a new message
       a(href='/logout') Logout
     if messages
       div.message-container
@@ -26,14 +26,14 @@ body
             span #{message.content}
             span
               small #{message.date.toLocaleDateString('en-us', {month:"short", day:"numeric", hour:'numeric', minute: 'numeric', second: 'numeric'})}
-            if user.isMember || user.isAdmin
+            if currentUser.isMember || currentUser.isAdmin
               span
                 small Posted by #{message.author.name}
-            if user.isAdmin
+            if currentUser.isAdmin
               form(action='' method='post')
                 input(type='hidden' name='id' value=message._id)
                 button Delete
   else
     h1 Welcome!
-    a(href='/sign-up') Sign up
+    a(href='/signup') Sign up
     a(href='/login') Login
