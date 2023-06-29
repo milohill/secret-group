@@ -47,9 +47,9 @@ app.set('view engine', 'pug');
 passport.use(
   new LocalStrategy(
     { usernameField: 'email', passwordField: 'password' },
-    async function (email, password, done) {
-      const user = await User.findOne({ email: email });
-      bcrypt.compare(password, user.password, function (err, res) {
+    (async (email, password, done) => {
+      const user = await User.findOne({ email });
+      bcrypt.compare(password, user.password, (err, res) => {
         if (res) {
           return done(null, user);
         }
@@ -57,14 +57,14 @@ passport.use(
           message: 'Incorrect password',
         });
       });
-    }
-  )
+    }),
+  ),
 );
-passport.serializeUser(function (user, done) {
+passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-passport.deserializeUser(async function (userId, done) {
+passport.deserializeUser(async (userId, done) => {
   try {
     const user = await User.findOne({ _id: userId }).exec();
     done(null, user);
@@ -87,7 +87,7 @@ app.use(
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
-  })
+  }),
 );
 app.use(passport.initialize());
 app.use(passport.session());
@@ -103,19 +103,19 @@ app.use(
   rateLimit({
     windowMs: 1 * 10 * 60 * 1000, // 10 minutes
     max: 100,
-  })
+  }),
 );
 
 // Route
 app.use('/', indexRoute);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   next(createError(404));
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
   console.log(err);
   // set locals, only providing error in development
   res.locals.message = err.message;
